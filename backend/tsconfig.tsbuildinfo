@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/config/cloudniary.ts","./src/config/multer.ts","./src/config/prisma.ts","./src/controller/auth.controller.ts","./src/controller/task.controller.ts","./src/middleware/authmiddleware.ts","./src/routes/user.ts","./src/routes/worker.ts","./src/types/multer-storage-cloudinary.d.ts","./src/types/type.ts"],"version":"5.8.3"}

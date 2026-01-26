@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+
+    /* Core project structure */
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    /* Interop & correctness */
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Type safety */
+    "strict": true,
+    "skipLibCheck": true
+  },
+
+  /* ✅ IMPORTANT: limit what TS compiles */
+  "include": ["src/**/*.ts"],
+
+  /* ✅ Explicitly exclude non-runtime files */
+  "exclude": [
+    "node_modules",
+    "dist",
+    "prisma",
+    "prisma.config.ts",
+    "prisma.config.js"
+  ]
+}
