@@ -25,7 +25,7 @@ model Worker {
   address        String       @unique
   submissions    Submission[]
   // balance        Balance?
-  balance_in     Int
+  // balance_Id     Int
   pending_amount Int
   locked_amount  Int
 }
@@ -43,6 +43,7 @@ model Task {
   options     Option[]
   signature   String
   amount      String
+  done        Boolean      @default(false)
   user_id     Int
   user        User         @relation(fields: [user_id], references: [id])
   submissions Submission[]
@@ -50,7 +51,7 @@ model Task {
 
 model Option {
   id          Int          @id @default(autoincrement())
-  image_url   String 
+  image_url   String
   task_id     Int
   task        Task         @relation(fields: [task_id], references: [id])
   submissions Submission[]
