@@ -17,8 +17,7 @@ app.get('/health', (req: Request, res: Response) => {
 })
 
 app.listen(5000, () => {
-    console.log("server is runnig on 5000");
-
+    console.log("server is runnig on port 5000");
 })
 
 
