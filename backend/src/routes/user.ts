@@ -8,12 +8,23 @@ const router = express.Router()
 
 router.post('/signup', signup)
 router.post('/upload',
-    () => {
-        console.log("upload route started,");
-    },
     upload.array("images", 5),
     uploadController
 );
+// router.post("/upload", (req, res, next) => {
+//     upload.array("images", 5)(req, res, (err) => {
+//         if (err) {
+//             console.error("Multer Error:", err);
+
+//             return res.status(400).json({
+//                 message: err.message || "Upload failed"
+//             });
+//         }
+
+//         next();
+//     });
+// }, uploadController);
+
 router.post('/task', authMiddleware, createTask)
 router.get('/task', authMiddleware, getTask)
 

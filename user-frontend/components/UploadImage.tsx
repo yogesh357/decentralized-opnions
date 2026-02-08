@@ -9,36 +9,101 @@ export function UploadImage({ onImageAdded, image }: {
 }) {
     const [uploading, setUploading] = useState(false);
 
+    // async function onFileSelect(e: any) {
+    //     setUploading(true);
+    //     try {
+    //         const file = e.target.files[0];
+    //         const response = await axios.get(`${BACKEND_URL}/v1/user/presignedUrl`, {
+    //             headers: {
+    //                 "Authorization": localStorage.getItem("token")
+    //             }
+    //         });
+    //         const presignedUrl = response.data.preSignedUrl;
+    //         const formData = new FormData();
+    //         formData.set("bucket", response.data.fields["bucket"])
+    //         formData.set("X-Amz-Algorithm", response.data.fields["X-Amz-Algorithm"]);
+    //         formData.set("X-Amz-Credential", response.data.fields["X-Amz-Credential"]);
+    //         formData.set("X-Amz-Algorithm", response.data.fields["X-Amz-Algorithm"]);
+    //         formData.set("X-Amz-Date", response.data.fields["X-Amz-Date"]);
+    //         formData.set("key", response.data.fields["key"]);
+    //         formData.set("Policy", response.data.fields["Policy"]);
+    //         formData.set("X-Amz-Signature", response.data.fields["X-Amz-Signature"]);
+    //         formData.set("X-Amz-Algorithm", response.data.fields["X-Amz-Algorithm"]);
+    //         formData.append("file", file);
+    //         const awsResponse = await axios.post(presignedUrl, formData);
+
+    //         onImageAdded(`${CLOUDFRONT_URL}/${response.data.fields["key"]}`);
+    //     } catch (e) {
+    //         console.log(e)
+    //     }
+    //     setUploading(false);
+    // }
+
+
+    // async function onFileSelect(e: any) {
+    //     setUploading(true);
+    //     try {
+    //         const file = e.target.files[0];
+    //         console.log("files on forntend ::", file);
+
+    //         const response = await axios.post(`${BACKEND_URL}/v1/user/upload`,
+    //             file,
+    //             {
+    //                 headers: {
+    //                     "Content-Type": "multipart/form-data", // Tell the server what's coming
+    //                     "Authorization": localStorage.getItem("token")
+    //                 }
+
+    //             }
+    //         );
+
+    //         console.log("reponse form the image upload :", response);
+
+
+    //         onImageAdded(`${CLOUDFRONT_URL}/${response.data.fields["key"]}`);
+    //     } catch (e) {
+    //         console.log(e)
+    //     }
+    //     setUploading(false);
+    // }
     async function onFileSelect(e: any) {
         setUploading(true);
         try {
             const file = e.target.files[0];
-            const response = await axios.get(`${BACKEND_URL}/v1/user/presignedUrl`, {
-                headers: {
-                    "Authorization": localStorage.getItem("token")
-                }
-            });
-            const presignedUrl = response.data.preSignedUrl;
+            if (!file) return;
+
+            // 1. Create FormData (Essential for Multer)
             const formData = new FormData();
-            formData.set("bucket", response.data.fields["bucket"])
-            formData.set("X-Amz-Algorithm", response.data.fields["X-Amz-Algorithm"]);
-            formData.set("X-Amz-Credential", response.data.fields["X-Amz-Credential"]);
-            formData.set("X-Amz-Algorithm", response.data.fields["X-Amz-Algorithm"]);
-            formData.set("X-Amz-Date", response.data.fields["X-Amz-Date"]);
-            formData.set("key", response.data.fields["key"]);
-            formData.set("Policy", response.data.fields["Policy"]);
-            formData.set("X-Amz-Signature", response.data.fields["X-Amz-Signature"]);
-            formData.set("X-Amz-Algorithm", response.data.fields["X-Amz-Algorithm"]);
-            formData.append("file", file);
-            const awsResponse = await axios.post(presignedUrl, formData);
 
-            onImageAdded(`${CLOUDFRONT_URL}/${response.data.fields["key"]}`);
+            // 2. Append the file using the key "images" 
+            // This MUST match upload.array("images", 5) on your backend
+            formData.append("images", file);
+
+            const response = await axios.post(`${BACKEND_URL}/v1/user/upload`,
+                formData, // Send the formData object, not the raw file
+                {
+                    headers: {
+                        // Note: Axios usually sets "Content-Type" automatically 
+                        // when it sees FormData, but keeping it is fine.
+                        "Authorization": localStorage.getItem("token") || ""
+                    }
+                }
+            );
+
+            console.log("Response from image upload:", response.data);
+
+            // 3. Extract the URL from your Cloudinary response
+            // Based on your controller, it returns: images: [{ url: "...", publicId: "..." }]
+            const imageUrl = response.data.images[0].url;
+
+            onImageAdded(imageUrl);
+
         } catch (e) {
-            console.log(e)
+            console.error("Upload error:", e);
+        } finally {
+            setUploading(false);
         }
-        setUploading(false);
     }
-
     if (image) {
         return <img className={"p-2 w-96 rounded"} src={image} />
     }

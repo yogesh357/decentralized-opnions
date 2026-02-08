@@ -12,8 +12,6 @@ export const createTask = async (req: Request, res: Response) => {
         const body = req.body;
         //@ts-ignore
         const userId = req.userId
-        console.log("user id in create task ::", userId);
-
 
         const parsedResult = createTaskInputs.safeParse(body)
 
@@ -27,8 +25,6 @@ export const createTask = async (req: Request, res: Response) => {
         const parsedData = parsedResult.data
         // parse the signature
         const amount = 1 * Number(TOTAL_DECIMALS)
-        console.log("amount ::", amount);
-        console.log("TOTAL DECIMALS::", TOTAL_DECIMALS);
 
         let response = await prisma.$transaction(async tx => {
             const response = await tx.task.create({

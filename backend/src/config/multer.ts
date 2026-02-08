@@ -2,11 +2,11 @@ import multer from "multer";
 import CloudinaryStorage from "multer-storage-cloudinary";
 import cloudinary from "./cloudniary";
 
-
+console.log("Cloudinary Config Check:", cloudinary.config());
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-        folder: "chat-images",
+        folder: "decentralised-opinions",
         allowed_formats: ["jpg", "jpeg", "png", "gif", "webp"],
         transformation: [{
             width: 800,
@@ -15,6 +15,7 @@ const storage = new CloudinaryStorage({
         }, { quality: "auto" }],
     }
 });
+
 
 export const upload = multer({
     storage,
@@ -29,4 +30,4 @@ export const upload = multer({
             cb(new Error("only image is allowed"));
         }
     }
-})
+}) 

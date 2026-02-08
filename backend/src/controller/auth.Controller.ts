@@ -39,7 +39,10 @@ export const signup = async (req: Request, res: Response) => {
 }
 export const uploadController = async (req: Request, res: Response) => {
     try {
+        console.log("file upload controller has started");
+
         const files = req.files as Express.Multer.File[];
+        console.log("[files from frontend] ", files);
 
         if (!files || files.length === 0) {
             return res.status(400).json({ message: "No files uploaded" });
@@ -50,6 +53,7 @@ export const uploadController = async (req: Request, res: Response) => {
             url: (file as any).path, // Cloudinary secure_url
             publicId: (file as any).filename
         }));
+        console.log("[cloudniary res ]", uploadedImages);
 
         res.json({
             message: "Upload successful",
