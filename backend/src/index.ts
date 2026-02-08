@@ -17,7 +17,7 @@ app.get('/health', (req: Request, res: Response) => {
 })
 
 app.listen(5000, () => {
-    console.log("server is runnig");
+    console.log("server is runnig on 5000");
 
 })
 

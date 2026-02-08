@@ -15,34 +15,27 @@ datasource db {
 }
 
 model User {
-  id      Int    @id @default(autoincrement())
-  address String @unique
+  id      Int       @id @default(autoincrement())
+  address String    @unique
   tasks   Task[]
+  payouts Payouts[]
 }
 
 model Worker {
   id             Int          @id @default(autoincrement())
   address        String       @unique
   submissions    Submission[]
-  // balance        Balance?
-  // balance_Id     Int
-  pending_amount Int
+  pending_amount Int // amount in lamports as (10^9)
   locked_amount  Int
+  // payouts        Payouts[]
 }
-
-// model Balance {
-//   id        Int    @id @default(autoincrement())
-//   amount    Int    @default(0)
-//   worker_id Int    @unique
-//   worker    Worker @relation(fields: [worker_id], references: [id])
-// }
 
 model Task {
   id          Int          @id @default(autoincrement())
   title       String       @default("Select the most clickable thumbnail")
   options     Option[]
   signature   String
-  amount      String
+  amount      Int
   done        Boolean      @default(false)
   user_id     Int
   user        User         @relation(fields: [user_id], references: [id])
@@ -65,19 +58,24 @@ model Submission {
   option    Option @relation(fields: [option_id], references: [id])
   task_id   Int
   task      Task   @relation(fields: [task_id], references: [id])
-  amount    String
+  amount    Int
+
+  @@unique([worker_id, task_id])
 }
 
-// model SubmissionCache {
-//   int      Int @default(autoincrement())
-//   task_id  Int
-//   options1 Int
-//   options2 Int
-//   options3 Int
-//   options4 Int
-//   options5 Int
-//   options6 Int
-//   options7 Int
-//   options8 Int
-//   options9 Int
-// }
+model Payouts {
+  id        Int       @id @default(autoincrement())
+  user_id   Int
+  user      User      @relation(fields: [user_id], references: [id])
+  amount    Int
+  signature String
+  status    TxnStatus
+  // worker    Worker    @relation(fields: [workerId], references: [id])
+  // workerId  Int
+}
+
+enum TxnStatus {
+  Processing
+  Success
+  Failure
+}

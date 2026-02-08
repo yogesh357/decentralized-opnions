@@ -4,11 +4,16 @@ import prisma from "../config/prisma";
 
 
 const DEFAULT_TITLE = "Select the most clickable thumbnail"
+// const TOTAL_DECIMALS = process.env.TOTAL_DECIMALS!
+const TOTAL_DECIMALS = Number(process.env.TOTAL_DECIMALS!);
+
 export const createTask = async (req: Request, res: Response) => {
     try {
         const body = req.body;
         //@ts-ignore
         const userId = req.userId
+        console.log("user id in create task ::", userId);
+
 
         const parsedResult = createTaskInputs.safeParse(body)
 
@@ -21,12 +26,15 @@ export const createTask = async (req: Request, res: Response) => {
 
         const parsedData = parsedResult.data
         // parse the signature
+        const amount = 1 * Number(TOTAL_DECIMALS)
+        console.log("amount ::", amount);
+        console.log("TOTAL DECIMALS::", TOTAL_DECIMALS);
 
         let response = await prisma.$transaction(async tx => {
             const response = await tx.task.create({
                 data: {
                     title: parsedData?.title ?? DEFAULT_TITLE,
-                    amount: "1",
+                    amount,
                     signature: parsedData?.signature!,
                     user_id: userId
                 }
@@ -40,12 +48,16 @@ export const createTask = async (req: Request, res: Response) => {
             })
             return response
         })
+        console.log("response :::", response);
+
         res.json({
             id: response.id
         })
     } catch (error) {
-
-
+        console.error(error);
+        res.status(500).json({
+            message: "Internal server error"
+        })
     }
 }
 
@@ -102,7 +114,10 @@ export const getTask = async (req: Request, res: Response) => {
             result
         })
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        res.status(500).json({
+            message: "Internal server error"
+        })
 
     }
 }
