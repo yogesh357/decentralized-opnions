@@ -21,7 +21,7 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.0.2",
-    "multer-storage-cloudinary": "^2.2.1",
+    "multer-storage-cloudinary": "^4.0.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

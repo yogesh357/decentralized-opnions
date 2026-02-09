@@ -71,6 +71,8 @@ export function UploadImage({ onImageAdded, image }: {
         try {
             const file = e.target.files[0];
             if (!file) return;
+            console.log("file on frontend to send to the backend :: ", file);
+
 
             // 1. Create FormData (Essential for Multer)
             const formData = new FormData();
@@ -83,8 +85,6 @@ export function UploadImage({ onImageAdded, image }: {
                 formData, // Send the formData object, not the raw file
                 {
                     headers: {
-                        // Note: Axios usually sets "Content-Type" automatically 
-                        // when it sees FormData, but keeping it is fine.
                         "Authorization": localStorage.getItem("token") || ""
                     }
                 }
