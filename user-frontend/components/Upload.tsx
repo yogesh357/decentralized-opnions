@@ -1,4 +1,4 @@
- 
+
 
 "use client";
 // import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
@@ -7,6 +7,7 @@ import { BACKEND_URL } from "@/utils";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "react-toastify";
 // import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 
 export const Upload = () => {
@@ -26,11 +27,14 @@ export const Upload = () => {
             signature: txSignature
         }, {
             headers: {
-                "Authorization": localStorage.getItem("token")
+                "Authorization": localStorage.getItem("token") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc3MDY2MDc0OH0.qkIdBixyur2xj9oHAHxLXDh-8GZ9QheoWs2mm2xcuOQ"
             }
         })
-
-        router.push(`/task/${response.data.id}`)
+        console.log("response form the add task ::", response);
+        if (response.data.success) {
+            toast.success("Task created successfully!");
+            router.push(`/task/${response.data.id}`)
+        }
     }
 
     // async function makePayment() {

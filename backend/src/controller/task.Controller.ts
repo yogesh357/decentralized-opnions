@@ -57,63 +57,137 @@ export const createTask = async (req: Request, res: Response) => {
     }
 }
 
+// export const getTask = async (req: Request, res: Response) => {
+//     try {
+//         //@ts-ignore
+//         const userId = req.userId;
+//         const { taskId } = req.query
+
+//         const taskDetail = await prisma.task.findFirst({
+//             where: {
+//                 user_id: Number(userId),
+//                 id: Number(taskId)
+//             },
+//             include: {
+//                 options: true,
+//             }
+
+//         })
+//         if (!taskDetail) {
+//             return res.json({
+//                 status: false,
+//                 message: "no task found !!"
+//             })
+//         }
+//         const response = await prisma.submission.findMany({
+//             where: {
+//                 task_id: Number(taskId)
+//             },
+//             include: {
+//                 option: true,
+//                 task: true
+//             }
+//         });
+
+//         const result: Record<string, {
+//             count: number,
+//             option: {
+//                 imageUrl: string
+//             }
+//         }> = {}
+//         taskDetail.options.forEach(option => {
+//             result[option.id] = {
+//                 count: 0,
+//                 option: {
+//                     imageUrl: option.image_url
+//                 }
+//             }
+//         })
+//         response.forEach(r => {
+//             result[r.option_id].count++
+//         })
+
+//         return res.json({
+//             result
+//         })
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({
+//             message: "Internal server error"
+//         })
+
+//     }
+// }
+
 export const getTask = async (req: Request, res: Response) => {
     try {
-        //@ts-ignore
-        const userId = req.userId;
-        const { taskId } = req.query
+        // @ts-ignore
+        const userId = Number(req.userId);
+        const taskId = Number(req.query.taskId);
 
-        const taskDetail = await prisma.task.findFirst({
-            where: {
-                user_id: Number(userId),
-                id: Number(taskId)
-            },
-            include: {
-                options: true
-            }
-
-        })
-        if (!taskDetail) {
-            return res.json({
-                status: false,
-                message: "no task found !!"
-            })
+        if (!taskId) {
+            return res.status(400).json({ message: "Task ID required" });
         }
-        const response = await prisma.submission.findMany({
+
+        const task = await prisma.task.findFirstOrThrow({
             where: {
-                task_id: Number(taskId)
+                id: taskId,
+                user_id: userId,
             },
             include: {
-                option: true
+                options: true,
+            },
+        });
+
+        const submissions = await prisma.submission.findMany({
+            where: {
+                task_id: taskId,
+            },
+            include: {
+                option: true,
+            },
+        });
+
+        const result: Record<
+            number,
+            {
+                count: number;
+                option: {
+                    imageUrl: string;
+                };
+            }
+        > = {};
+
+        // Init counts
+        task.options.forEach((opt) => {
+            result[opt.id] = {
+                count: 0,
+                option: {
+                    imageUrl: opt.image_url,
+                },
+            };
+        });
+
+        // Count votes
+        submissions.forEach((sub) => {
+            if (result[sub.option_id]) {
+                result[sub.option_id].count++;
             }
         });
 
-        const result: Record<string, {
-            count: number,
-            option: {
-                imageUrl: string
-            }
-        }> = {}
-        taskDetail.options.forEach(option => {
-            result[option.id] = {
-                count: 0,
-                option: {
-                    imageUrl: option.image_url
-                }
-            }
-        })
-        response.forEach(r => {
-            result[r.option_id].count++
-        })
-
         return res.json({
-            result
-        })
+            task: {
+                id: task.id,
+                title: task.title,
+                amount: task.amount,
+            },
+            result,
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).json({
-            message: "Internal server error"
-        })
 
+        return res.status(500).json({
+            message: "Internal server error",
+        });
     }
-}
+};

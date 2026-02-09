@@ -1,6 +1,7 @@
 import prisma from "../config/prisma"
 import jwt from "jsonwebtoken"
 import { Request, Response } from "express"
+import { success } from "zod"
 
 export const signup = async (req: Request, res: Response) => {
     // TODO add sign verification logic
@@ -56,11 +57,15 @@ export const uploadController = async (req: Request, res: Response) => {
         console.log("[cloudniary res ]", uploadedImages);
 
         res.json({
+            success: true,
             message: "Upload successful",
             images: uploadedImages
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Upload failed" });
+        res.status(500).json({
+            success: false,
+            message: "Upload failed"
+        });
     }
 };

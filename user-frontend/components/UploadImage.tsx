@@ -19,9 +19,7 @@ export function UploadImage({ onImageAdded, image }: {
 
             // 1. Create FormData (Essential for Multer)
             const formData = new FormData();
-
-            // 2. Append the file using the key "images" 
-            // This MUST match upload.array("images", 5) on your backend
+ 
             formData.append("images", file);
 
             const response = await axios.post(`${BACKEND_URL}/v1/user/upload`,
