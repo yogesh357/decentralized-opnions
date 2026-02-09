@@ -1,5 +1,5 @@
-"use client"
-import { BACKEND_URL, CLOUDFRONT_URL } from "@/utils";
+"use client";
+import { BACKEND_URL } from "@/utils";
 import axios from "axios";
 import { useState } from "react"
 
@@ -9,63 +9,6 @@ export function UploadImage({ onImageAdded, image }: {
 }) {
     const [uploading, setUploading] = useState(false);
 
-    // async function onFileSelect(e: any) {
-    //     setUploading(true);
-    //     try {
-    //         const file = e.target.files[0];
-    //         const response = await axios.get(`${BACKEND_URL}/v1/user/presignedUrl`, {
-    //             headers: {
-    //                 "Authorization": localStorage.getItem("token")
-    //             }
-    //         });
-    //         const presignedUrl = response.data.preSignedUrl;
-    //         const formData = new FormData();
-    //         formData.set("bucket", response.data.fields["bucket"])
-    //         formData.set("X-Amz-Algorithm", response.data.fields["X-Amz-Algorithm"]);
-    //         formData.set("X-Amz-Credential", response.data.fields["X-Amz-Credential"]);
-    //         formData.set("X-Amz-Algorithm", response.data.fields["X-Amz-Algorithm"]);
-    //         formData.set("X-Amz-Date", response.data.fields["X-Amz-Date"]);
-    //         formData.set("key", response.data.fields["key"]);
-    //         formData.set("Policy", response.data.fields["Policy"]);
-    //         formData.set("X-Amz-Signature", response.data.fields["X-Amz-Signature"]);
-    //         formData.set("X-Amz-Algorithm", response.data.fields["X-Amz-Algorithm"]);
-    //         formData.append("file", file);
-    //         const awsResponse = await axios.post(presignedUrl, formData);
-
-    //         onImageAdded(`${CLOUDFRONT_URL}/${response.data.fields["key"]}`);
-    //     } catch (e) {
-    //         console.log(e)
-    //     }
-    //     setUploading(false);
-    // }
-
-
-    // async function onFileSelect(e: any) {
-    //     setUploading(true);
-    //     try {
-    //         const file = e.target.files[0];
-    //         console.log("files on forntend ::", file);
-
-    //         const response = await axios.post(`${BACKEND_URL}/v1/user/upload`,
-    //             file,
-    //             {
-    //                 headers: {
-    //                     "Content-Type": "multipart/form-data", // Tell the server what's coming
-    //                     "Authorization": localStorage.getItem("token")
-    //                 }
-
-    //             }
-    //         );
-
-    //         console.log("reponse form the image upload :", response);
-
-
-    //         onImageAdded(`${CLOUDFRONT_URL}/${response.data.fields["key"]}`);
-    //     } catch (e) {
-    //         console.log(e)
-    //     }
-    //     setUploading(false);
-    // }
     async function onFileSelect(e: any) {
         setUploading(true);
         try {
@@ -104,20 +47,39 @@ export function UploadImage({ onImageAdded, image }: {
             setUploading(false);
         }
     }
+
     if (image) {
-        return <img className={"p-2 w-96 rounded"} src={image} />
+        return (
+            <div className="relative group w-full h-40 rounded-xl overflow-hidden shadow-sm border border-gray-200">
+                <img className="w-full h-full object-cover" src={image} alt="Uploaded preview" />
+            </div>
+        )
     }
 
-    return <div>
-        <div className="w-40 h-40 rounded border text-2xl cursor-pointer">
-            <div className="h-full flex justify-center flex-col relative w-full">
-                <div className="h-full flex justify-center w-full pt-16 text-4xl">
-                    {uploading ? <div className="text-sm">Loading...</div> : <>
-                        +
-                        <input className="w-full h-full bg-red-400 w-40 h-40" type="file" style={{ position: "absolute", opacity: 0, top: 0, left: 0, bottom: 0, right: 0, width: "100%", height: "100%" }} onChange={onFileSelect} />
-                    </>}
-                </div>
+    return (
+        <div className="w-full h-40 rounded-xl border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer bg-gray-50">
+            <div className="h-full flex flex-col justify-center items-center relative w-full">
+                {uploading ? (
+                    <div className="text-sm font-medium text-gray-500 flex flex-col items-center gap-2">
+                        <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+                        Loading...
+                    </div>
+                ) : (
+                    <>
+                        <div className="text-gray-400 mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                        </div>
+                        <span className="text-sm text-gray-500 font-medium">Click to Upload</span>
+                        <input
+                            className="w-full h-full absolute inset-0 cursor-pointer z-10 opacity-0"
+                            type="file"
+                            onChange={onFileSelect}
+                        />
+                    </>
+                )}
             </div>
         </div>
-    </div>
+    )
 }
