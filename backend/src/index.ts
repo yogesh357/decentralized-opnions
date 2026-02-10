@@ -3,7 +3,12 @@ import userRouter from './routes/user'
 import workerRouter from './routes/worker'
 import cors from 'cors'
 const app = express()
-app.use(cors())
+
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+    optionsSuccessStatus: 200
+}))
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '10mb' })); // Increase the payload size limit to 10MB
 
