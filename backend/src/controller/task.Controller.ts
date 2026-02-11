@@ -4,7 +4,6 @@ import prisma from "../config/prisma";
 
 
 const DEFAULT_TITLE = "Select the most clickable thumbnail"
-// const TOTAL_DECIMALS = process.env.TOTAL_DECIMALS!
 const TOTAL_DECIMALS = Number(process.env.TOTAL_DECIMALS!);
 
 export const createTask = async (req: Request, res: Response) => {
@@ -55,68 +54,6 @@ export const createTask = async (req: Request, res: Response) => {
         })
     }
 }
-
-// export const getTask = async (req: Request, res: Response) => {
-//     try {
-//         //@ts-ignore
-//         const userId = req.userId;
-//         const { taskId } = req.query
-
-//         const taskDetail = await prisma.task.findFirst({
-//             where: {
-//                 user_id: Number(userId),
-//                 id: Number(taskId)
-//             },
-//             include: {
-//                 options: true,
-//             }
-
-//         })
-//         if (!taskDetail) {
-//             return res.json({
-//                 status: false,
-//                 message: "no task found !!"
-//             })
-//         }
-//         const response = await prisma.submission.findMany({
-//             where: {
-//                 task_id: Number(taskId)
-//             },
-//             include: {
-//                 option: true,
-//                 task: true
-//             }
-//         });
-
-//         const result: Record<string, {
-//             count: number,
-//             option: {
-//                 imageUrl: string
-//             }
-//         }> = {}
-//         taskDetail.options.forEach(option => {
-//             result[option.id] = {
-//                 count: 0,
-//                 option: {
-//                     imageUrl: option.image_url
-//                 }
-//             }
-//         })
-//         response.forEach(r => {
-//             result[r.option_id].count++
-//         })
-
-//         return res.json({
-//             result
-//         })
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({
-//             message: "Internal server error"
-//         })
-
-//     }
-// }
 
 export const getTask = async (req: Request, res: Response) => {
     try {

@@ -1,12 +1,9 @@
-import NextTask from "@/components/NextTask";
-import TaskList from "@/components/TaskList";
-import Image from "next/image";
+import NextTask from "@/components/NextTask"; 
 
 export default function Home() {
   return (
 
-    <div>
-      {/* <TaskList /> */}
+    <div> 
       <NextTask />
     </div>
   );
