@@ -1,4 +1,4 @@
-import e, { Request, Response } from "express";
+import { Request, Response } from "express";
 import { createTaskInputs } from "../types/type";
 import prisma from "../config/prisma";
 
@@ -44,7 +44,6 @@ export const createTask = async (req: Request, res: Response) => {
             })
             return response
         })
-        console.log("response :::", response);
 
         res.json({
             id: response.id
@@ -129,7 +128,7 @@ export const getTask = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Task ID required" });
         }
 
-        const task = await prisma.task.findFirstOrThrow({
+        const task = await prisma.task.findFirst({
             where: {
                 id: taskId,
                 user_id: userId,
@@ -138,7 +137,9 @@ export const getTask = async (req: Request, res: Response) => {
                 options: true,
             },
         });
-
+        if (!task) {
+            return res.status(400).json({ message: "No Task found " });
+        }
         const submissions = await prisma.submission.findMany({
             where: {
                 task_id: taskId,

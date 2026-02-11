@@ -52,8 +52,7 @@ function TaskPage() {
                         "Authorization": token
                     }
                 });
-
-                console.log("Response from get task:", response.data);
+ 
                 setData(response.data);
 
             } catch (e: any) {

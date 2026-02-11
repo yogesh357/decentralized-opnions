@@ -13,8 +13,7 @@ export function UploadImage({ onImageAdded, image }: {
         setUploading(true);
         try {
             const file = e.target.files[0];
-            if (!file) return;
-            console.log("file on frontend to send to the backend :: ", file);
+            if (!file) return; 
 
 
             // 1. Create FormData (Essential for Multer)
@@ -30,8 +29,7 @@ export function UploadImage({ onImageAdded, image }: {
                     }
                 }
             );
-
-            console.log("Response from image upload:", response.data);
+ 
 
             // 3. Extract the URL from your Cloudinary response
             // Based on your controller, it returns: images: [{ url: "...", publicId: "..." }]

@@ -39,11 +39,9 @@ export const signup = async (req: Request, res: Response) => {
 
 }
 export const uploadController = async (req: Request, res: Response) => {
-    try {
-        console.log("file upload controller has started");
+    try { 
 
-        const files = req.files as Express.Multer.File[];
-        console.log("[files from frontend] ", files);
+        const files = req.files as Express.Multer.File[]; 
 
         if (!files || files.length === 0) {
             return res.status(400).json({ message: "No files uploaded" });
@@ -53,8 +51,7 @@ export const uploadController = async (req: Request, res: Response) => {
         const uploadedImages = files.map((file) => ({
             url: (file as any).path, // Cloudinary secure_url
             publicId: (file as any).filename
-        }));
-        console.log("[cloudniary res ]", uploadedImages);
+        })); 
 
         res.json({
             success: true,

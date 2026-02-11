@@ -12,7 +12,6 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
         })
     }
     try {
-        console.log("auth middleware started");
 
         const decodedToken = jwt.verify(token, JWT_SECRETE)
         //@ts-ignore
@@ -38,7 +37,6 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 
 export const workerMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const token = req.cookies?.token || req.header("authorization")
-    console.log("token::", token);
 
     const JWT_SECRETE = process.env.WORKER_JWT_SECRETE!;
     if (!token) {
@@ -49,18 +47,14 @@ export const workerMiddleware = (req: Request, res: Response, next: NextFunction
     }
     try {
 
-        console.log("some where bw work middleware");
         const decodedToken = jwt.verify(token, JWT_SECRETE)
-        console.log("some where bw work middleware-2");
         //@ts-ignore
         if (decodedToken.userId) {
             //@ts-ignore
             req.userId = decodedToken.userId;
-            console.log("worker middleware is completed with success");
 
             return next();
         } else {
-            console.log("worker middleware is completed with error");
             return res.status(403).json({
                 success: false,
                 message: "You are not logged in "

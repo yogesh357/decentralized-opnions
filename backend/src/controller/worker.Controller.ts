@@ -144,7 +144,7 @@ export const getNextTaskforWorker = async (req: Request, res: Response) => {
                 message: "No more tasks left for you to review"
             })
         } else {
-            res.status(411).json({
+            res.status(200).json({
                 task
             })
         }
@@ -206,6 +206,10 @@ export const taskSubmission = async (req: Request, res: Response) => {
             res.json({
                 nextTask,
                 amount
+            })
+        } else {
+            res.status(411).json({
+                message: "incorrects inputs"
             })
         }
     } catch (error) {

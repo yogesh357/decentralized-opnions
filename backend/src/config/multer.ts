@@ -1,9 +1,7 @@
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "./cloudniary";
-
-console.log("Cloudinary Config Check:", cloudinary.config());
-
+ 
 // Create storage with synchronous params (no async function)
 const storage = new CloudinaryStorage({
     cloudinary,
