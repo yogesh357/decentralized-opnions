@@ -26,10 +26,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
     const network = WalletAdapterNetwork.Devnet;
 
-    const endpoint = useMemo(
-        () => clusterApiUrl(network),
-        [network]
-    );
+    const endpoint = process.env.RPC_URL!;
+    console.log("rpc endpoint ::", endpoint);
 
     const wallets = useMemo(
         () => [

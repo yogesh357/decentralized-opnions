@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
 import { createTaskInputs } from "../types/type";
 import prisma from "../config/prisma";
+import { Connection } from "@solana/web3.js";
 
 
 const DEFAULT_TITLE = "Select the most clickable thumbnail"
 const TOTAL_DECIMALS = Number(process.env.TOTAL_DECIMALS!);
 
+const connection = new Connection(process.env.RPC_URL! as string)
 export const createTask = async (req: Request, res: Response) => {
     try {
         const body = req.body;
@@ -13,6 +15,11 @@ export const createTask = async (req: Request, res: Response) => {
         const userId = req.userId
 
         const parsedResult = createTaskInputs.safeParse(body)
+        const user = await prisma.user.findFirst({
+            where: {
+                id: userId
+            }
+        })
 
         if (!parsedResult.success) {
             return res.status(411).json({
@@ -24,6 +31,34 @@ export const createTask = async (req: Request, res: Response) => {
         const parsedData = parsedResult.data
         // parse the signature
         const amount = 1 * Number(TOTAL_DECIMALS)
+        const transaction = await connection.getTransaction(parsedData.signature, {
+            maxSupportedTransactionVersion: 1
+        });
+
+        console.log(transaction);
+
+        if ((transaction?.meta?.postBalances[1] ?? 0) - (transaction?.meta?.preBalances[1] ?? 0) !== 100000000) {
+            return res.status(411).json({
+                message: "Transaction signature/amount incorrect"
+            })
+        }
+
+        if (transaction?.transaction.message.getAccountKeys().get(1)?.toString() !== process.env.PARENT_WALLET_ADDRESS!) {
+            return res.status(411).json({
+                message: "Transaction sent to wrong address"
+            })
+        }
+
+        if (transaction?.transaction.message.getAccountKeys().get(0)?.toString() !== user?.address) {
+            return res.status(411).json({
+                message: "Transaction sent to wrong address"
+            })
+        }
+        // was this money paid by this user address or a different address?
+
+        // parse the signature here to ensure the person has paid 0.1 SOL
+        // const transaction = Transaction.from(parseData.data.signature);
+
 
         let response = await prisma.$transaction(async tx => {
             const response = await tx.task.create({

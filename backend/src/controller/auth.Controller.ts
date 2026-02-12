@@ -1,15 +1,28 @@
 import prisma from "../config/prisma"
 import jwt from "jsonwebtoken"
 import { Request, Response } from "express"
-import { success } from "zod"
+import nacl from "tweetnacl"
+import { PublicKey } from "@solana/web3.js"
 
 export const signup = async (req: Request, res: Response) => {
     // TODO add sign verification logic
     const hardCodedWalletAddress = "9MCiJLwrhhvPAH2TwL5FSbpcJDovZABvCLZFp2c76rHq"
+    const { signature, publicKey } = req.body
+    console.log("req.body : for user -> signup ", req.body);
+    const message = new TextEncoder().encode("Sign into mechanical turks")
+
+    const result = nacl.sign.detached.verify(
+        message,
+        new Uint8Array(signature.data),
+        new PublicKey(publicKey).toBytes()
+    )
+    console.log(result);
 
     const existingUser = await prisma.user.findFirst({
         where: {
-            address: hardCodedWalletAddress
+            // address: hardCodedWalletAddress
+            address: publicKey
+
         }
     })
 
@@ -25,7 +38,8 @@ export const signup = async (req: Request, res: Response) => {
     } else {
         const user = await prisma.user.create({
             data: {
-                address: hardCodedWalletAddress
+                // address: hardCodedWalletAddress
+                address: publicKey
             }
         })
         const token = jwt.sign({
@@ -39,9 +53,9 @@ export const signup = async (req: Request, res: Response) => {
 
 }
 export const uploadController = async (req: Request, res: Response) => {
-    try { 
+    try {
 
-        const files = req.files as Express.Multer.File[]; 
+        const files = req.files as Express.Multer.File[];
 
         if (!files || files.length === 0) {
             return res.status(400).json({ message: "No files uploaded" });
@@ -51,7 +65,7 @@ export const uploadController = async (req: Request, res: Response) => {
         const uploadedImages = files.map((file) => ({
             url: (file as any).path, // Cloudinary secure_url
             publicId: (file as any).filename
-        })); 
+        }));
 
         res.json({
             success: true,
