@@ -1,4 +1,5 @@
-import Appbar from "@/components/Appbar";
+
+import { Appbar } from "@/components/Appbar";
 import { Upload } from "@/components/Upload";
 import { UploadImage } from "@/components/UploadImage";
 
