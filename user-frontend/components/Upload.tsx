@@ -30,6 +30,7 @@ export const Upload = () => {
                 "Authorization": localStorage.getItem("token") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc3MDY2MDc0OH0.qkIdBixyur2xj9oHAHxLXDh-8GZ9QheoWs2mm2xcuOQ"
             }
         })
+
         console.log("response form the add task ::", response);
         if (response.data.success) {
             toast.success("Task created successfully!");
