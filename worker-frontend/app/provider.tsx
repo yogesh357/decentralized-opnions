@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 
+
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import {
     ConnectionProvider,
@@ -9,9 +10,7 @@ import {
 } from "@solana/wallet-adapter-react";
 
 import {
-    WalletModalProvider,
-    WalletMultiButton,
-    WalletDisconnectButton
+    WalletModalProvider
 } from "@solana/wallet-adapter-react-ui";
 
 import {
@@ -19,27 +18,16 @@ import {
     SolflareWalletAdapter
 } from "@solana/wallet-adapter-wallets";
 
-import { clusterApiUrl } from "@solana/web3.js";
+// import { clusterApiUrl } from "@solana/web3.js";
 
-// Default styles
-require("@solana/wallet-adapter-react-ui/styles.css");
+import "@solana/wallet-adapter-react-ui/styles.css";
 
-export default function RootLayout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
 
-    // Network
+export function Providers({ children }: { children: React.ReactNode }) {
+
     const network = WalletAdapterNetwork.Devnet;
 
-    // RPC endpoint
-    const endpoint = useMemo(
-        () => clusterApiUrl(network),
-        [network]
-    );
-
-    // Register wallets (IMPORTANT)
+    const endpoint = process.env.NEXT_PUBLIC_RPC_URL!;
     const wallets = useMemo(
         () => [
             new PhantomWalletAdapter(),
@@ -52,15 +40,7 @@ export default function RootLayout({
         <ConnectionProvider endpoint={endpoint}>
             <WalletProvider wallets={wallets} autoConnect>
                 <WalletModalProvider>
-                    {/* Buttons */}
-                    <div className="bg-red-400 p-10">
-                        buttons 
-                    </div>
-                    <WalletMultiButton />
-                    <WalletDisconnectButton />
-
                     {children}
-
                 </WalletModalProvider>
             </WalletProvider>
         </ConnectionProvider>

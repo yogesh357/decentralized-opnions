@@ -4,13 +4,29 @@ import prisma from '../config/prisma'
 import jwt from 'jsonwebtoken'
 import { getNextTask } from '../config/db'
 import { createSubmissionInput } from '../types/type'
+import nacl from 'tweetnacl'
+import { PublicKey } from '@solana/web3.js'
 
 const TOTAL_DECIMALS = Number(process.env.TOTAL_DECIMALS!)
 
 export const signup = async (req: Request, res: Response) => {
     // TODO add sign verification logic
     const hardCodedWalletAddress = "9MCiJLwrhhvPAH2TwL5FSbpcJDovZABvCLZFp2c76rHq"
+    const { signature, publicKey } = req.body
+    console.log("req.body : for user -> signup ", req.body);
+    const message = new TextEncoder().encode("Sign into mechanical turks")
 
+    const result = nacl.sign.detached.verify(
+        message,
+        new Uint8Array(signature.data),
+        new PublicKey(publicKey).toBytes()
+    )
+    if (!result) {
+        return res.status(402).json({
+            success: false,
+            message: "Incorrect Signature !!"
+        })
+    }
     const existingUser = await prisma.worker.findFirst({
         where: {
             address: hardCodedWalletAddress

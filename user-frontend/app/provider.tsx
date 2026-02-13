@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 
+
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import {
     ConnectionProvider,
@@ -26,8 +27,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
     const network = WalletAdapterNetwork.Devnet;
 
-    const endpoint = process.env.RPC_URL!;
-    console.log("rpc endpoint ::", endpoint);
+    const endpoint = process.env.NEXT_PUBLIC_RPC_URL!;
+    console.log("RPC ENDPOINT:", endpoint);
 
     const wallets = useMemo(
         () => [

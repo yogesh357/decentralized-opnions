@@ -16,7 +16,12 @@ export const signup = async (req: Request, res: Response) => {
         new Uint8Array(signature.data),
         new PublicKey(publicKey).toBytes()
     )
-    console.log(result);
+    if (!result) {
+        return res.status(402).json({
+            success: false,
+            message: "Incorrect Signature !!"
+        })
+    }
 
     const existingUser = await prisma.user.findFirst({
         where: {

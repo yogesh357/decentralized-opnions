@@ -13,12 +13,12 @@ export function UploadImage({ onImageAdded, image }: {
         setUploading(true);
         try {
             const file = e.target.files[0];
-            if (!file) return; 
+            if (!file) return;
 
 
             // 1. Create FormData (Essential for Multer)
             const formData = new FormData();
- 
+
             formData.append("images", file);
 
             const response = await axios.post(`${BACKEND_URL}/v1/user/upload`,
@@ -29,11 +29,12 @@ export function UploadImage({ onImageAdded, image }: {
                     }
                 }
             );
- 
+
 
             // 3. Extract the URL from your Cloudinary response
             // Based on your controller, it returns: images: [{ url: "...", publicId: "..." }]
             const imageUrl = response.data.images[0].url;
+            console.log("image upload response ::", response);
 
             onImageAdded(imageUrl);
 

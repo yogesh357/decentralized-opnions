@@ -1,11 +1,9 @@
-
-
 "use client";
 // import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 import { UploadImage } from "@/components/UploadImage";
 import { BACKEND_URL } from "@/utils";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,6 +19,12 @@ export const Upload = () => {
     const router = useRouter();
 
     async function onSubmit() {
+        console.log("Payload for task submit :", images.map(image => ({
+            imageUrl: image,
+        })),
+            title,
+            txSignature);
+
         const response = await axios.post(`${BACKEND_URL}/v1/user/task`, {
             options: images.map(image => ({
                 imageUrl: image,
@@ -40,26 +44,75 @@ export const Upload = () => {
         }
     }
 
+    // async function makePayment() {
+
+    //     const transaction = new Transaction().add(
+    //         SystemProgram.transfer({
+    //             fromPubkey: publicKey!,
+    //             toPubkey: new PublicKey("Bo7Vsz4EFpDCWUeC9FfpnvRNF6jApmneoTLoMF1TFd3c"), //->yogesh-local 
+    //             lamports: 1 * LAMPORTS_PER_SOL,
+    //         })
+    //     );
+
+    //     const {
+    //         context: { slot: minContextSlot },
+    //         value: { blockhash, lastValidBlockHeight }
+    //     } = await connection.getLatestBlockhashAndContext();
+
+    //     const signature = await sendTransaction(transaction, connection, { minContextSlot });
+
+    //     await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature });
+    //     setTxSignature(signature);
+    // }
+
     async function makePayment() {
+        if (!publicKey) {
+            toast.error("Wallet not connected");
+            return;
+        }
+
+        const receiver = new PublicKey("Bo7Vsz4EFpDCWUeC9FfpnvRNF6jApmneoTLoMF1TFd3c");
+
+        // DEBUGGING: Check if you are sending to yourself
+        console.log("Sender:", publicKey.toString());
+        console.log("Receiver:", receiver.toString());
+
+        if (publicKey.toString() === receiver.toString()) {
+            toast.error("You are trying to pay yourself! Please use a different wallet.");
+            return;
+        }
 
         const transaction = new Transaction().add(
             SystemProgram.transfer({
-                fromPubkey: publicKey!,
-                toPubkey: new PublicKey("Bo7Vsz4EFpDCWUeC9FfpnvRNF6jApmneoTLoMF1TFd3c"), //->yogesh-local
-                lamports: 100000000,
+                fromPubkey: publicKey,
+                toPubkey: receiver,
+                // 0.1 SOL = 100,000,000 Lamports
+                // Using the constant prevents math errors
+                lamports: 0.1 * LAMPORTS_PER_SOL,
             })
         );
 
-        const {
-            context: { slot: minContextSlot },
-            value: { blockhash, lastValidBlockHeight }
-        } = await connection.getLatestBlockhashAndContext();
+        try {
+            const {
+                context: { slot: minContextSlot },
+                value: { blockhash, lastValidBlockHeight }
+            } = await connection.getLatestBlockhashAndContext();
 
-        const signature = await sendTransaction(transaction, connection, { minContextSlot });
+            const signature = await sendTransaction(transaction, connection, { minContextSlot });
 
-        await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature });
-        setTxSignature(signature);
+            await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature });
+
+            console.log("Transaction successful:", signature);
+            setTxSignature(signature);
+            toast.success("Payment successful!");
+
+        } catch (error) {
+            console.error("Payment failed", error);
+            toast.error("Payment failed. See console for details.");
+        }
     }
+
+
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 flex justify-center">
