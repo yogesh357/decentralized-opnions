@@ -5,7 +5,11 @@ import jwt from 'jsonwebtoken'
 import { getNextTask } from '../config/db'
 import { createSubmissionInput } from '../types/type'
 import nacl from 'tweetnacl'
-import { PublicKey } from '@solana/web3.js'
+import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, sendAndConfirmTransaction, SendTransactionError, SystemProgram, Transaction } from '@solana/web3.js'
+
+import bs58 from 'bs58'
+
+const connection = new Connection(process.env.RPC_URL ?? "");
 
 const TOTAL_DECIMALS = Number(process.env.TOTAL_DECIMALS!)
 
@@ -41,7 +45,8 @@ export const signup = async (req: Request, res: Response) => {
 
         res.status(202).json({
             success: true,
-            token
+            token,
+            amount: existingUser.pending_amount / TOTAL_DECIMALS
         });
     } else {
         const user = await prisma.worker.create({
@@ -56,7 +61,8 @@ export const signup = async (req: Request, res: Response) => {
         }, process.env.WORKER_JWT_SECRETE!)
         res.status(202).json({
             success: true,
-            token
+            token,
+            amount: 0
         });
     }
 
@@ -72,8 +78,8 @@ export const getWorkerBalance = async (req: Request, res: Response) => {
             }
         })
         res.status(200).json({
-            pendingAmount: worker?.pending_amount,
-            lockedAmount: worker?.locked_amount
+            pendingAmount: (worker?.pending_amount ?? 0) / TOTAL_DECIMALS,
+            lockedAmount: (worker?.locked_amount ?? 0) / TOTAL_DECIMALS,
         })
     } catch (error) {
         console.error(error);
@@ -96,8 +102,37 @@ export const workerPayout = async (req: Request, res: Response) => {
                 message: "user not found"
             })
         }
-        //TODO -> logi to create txns
-        const txnId = "0x2fwfwrfjijj"
+        console.log("payout started")
+        const transaction = new Transaction().add(
+            SystemProgram.transfer({
+                fromPubkey: new PublicKey(process.env.PARENT_WALLET_ADDRESS!),
+                toPubkey: new PublicKey(worker.address),
+                // lamports: worker.locked_amount,
+                lamports: (worker.pending_amount / TOTAL_DECIMALS) * LAMPORTS_PER_SOL,
+            })
+        );
+        console.log('transaction completed', transaction);
+
+        const keypair = Keypair.fromSecretKey(bs58.decode(process.env.PARENT_WALLET_PRIVATE_ADDRESS!))
+        // console.log(keypair.secretKey.toString())
+
+        let signature = "";
+        try {
+            signature = await sendAndConfirmTransaction(
+                connection,
+                transaction,
+                [keypair],
+            );
+
+        } catch (e) {
+            return res.json({
+                message: "Transaction failed"
+            })
+        }
+
+        console.log(signature)
+
+        // TODO : lock the databse
         await prisma.$transaction(async txn => {
             await txn.worker.update({
                 where: {
@@ -117,7 +152,8 @@ export const workerPayout = async (req: Request, res: Response) => {
                     user_id: Number(userId),
                     amount: worker.pending_amount,
                     status: "Processing",
-                    signature: txnId
+                    // signature: txnId?.toString()
+                    signature: signature
                 }
             })
         })
