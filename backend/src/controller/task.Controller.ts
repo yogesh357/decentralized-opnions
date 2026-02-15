@@ -235,8 +235,9 @@ export const createTask = async (req: Request, res: Response) => {
         /* ----------------------------------
            7️⃣ Verify Transfer Instruction
         -----------------------------------*/
+        //@ts-ignore
         const instructions = tx.transaction.message.instructions;
-
+        //@ts-ignore
         const hasTransfer = instructions.some((ix) => {
             const programId =
                 tx.transaction.message

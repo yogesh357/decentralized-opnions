@@ -4,7 +4,7 @@ import { BACKEND_URL, WORKER_TOKEN } from ".";
 const API_CLIENT = axios.create({
     baseURL: BACKEND_URL,
     headers: {
-        "Authorization": WORKER_TOKEN
+        "Authorization": localStorage.getItem("token")
     },
     withCredentials: true,
 })

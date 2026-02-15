@@ -1,12 +1,16 @@
+"use client";
 import { Appbar } from "@/components/Appbar";
+import Landing from "@/components/Landing";
 import NextTask from "@/components/NextTask";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export default function Home() {
-  return (
+  const { publicKey } = useWallet();
 
+  return (
     <div>
       <Appbar />
-      <NextTask />
+      {publicKey ? <NextTask /> : <Landing />}
     </div>
   );
 }

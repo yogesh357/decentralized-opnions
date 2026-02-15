@@ -180,6 +180,8 @@ export const taskSubmission = async (req: Request, res: Response) => {
     try {
         // @ts-ignore
         const userId = req.userId;
+        console.log("user ID for task subbmission in worker controller ::", userId);
+
         const body = req.body;
         const parsedBody = createSubmissionInput.safeParse(body)
 
@@ -193,7 +195,7 @@ export const taskSubmission = async (req: Request, res: Response) => {
             }
             // const amount = (Number(task.amount) / Number(TOTAL_SUBMISSIONS)).toString()
             const amount = Number(task.amount) / Number(TOTAL_SUBMISSIONS)
-            console.log("amount in submission ::", amount);
+            // console.log("amount in submission ::", amount);
 
             const submission = await prisma.$transaction(async txn => {
                 const submission = await txn.submission.create({
