@@ -1,9 +1,11 @@
-import NextTask from "@/components/NextTask"; 
+import { Appbar } from "@/components/Appbar";
+import NextTask from "@/components/NextTask";
 
 export default function Home() {
   return (
 
-    <div> 
+    <div>
+      <Appbar />
       <NextTask />
     </div>
   );

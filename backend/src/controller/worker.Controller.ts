@@ -11,7 +11,7 @@ const TOTAL_DECIMALS = Number(process.env.TOTAL_DECIMALS!)
 
 export const signup = async (req: Request, res: Response) => {
     // TODO add sign verification logic
-    const hardCodedWalletAddress = "9MCiJLwrhhvPAH2TwL5FSbpcJDovZABvCLZFp2c76rHq"
+    // const hardCodedWalletAddress = "9MCiJLwrhhvPAH2TwL5FSbpcJDovZABvCLZFp2c76rHq"
     const { signature, publicKey } = req.body
     console.log("req.body : for user -> signup ", req.body);
     const message = new TextEncoder().encode("Sign into mechanical turks")
@@ -29,7 +29,8 @@ export const signup = async (req: Request, res: Response) => {
     }
     const existingUser = await prisma.worker.findFirst({
         where: {
-            address: hardCodedWalletAddress
+            // address: hardCodedWalletAddress
+            address: publicKey
         }
     })
 
@@ -45,7 +46,7 @@ export const signup = async (req: Request, res: Response) => {
     } else {
         const user = await prisma.worker.create({
             data: {
-                address: hardCodedWalletAddress,
+                address: publicKey,
                 pending_amount: 0,
                 locked_amount: 0
             }
